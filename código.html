@@ -1,0 +1,61 @@
+<div class='row socio-torcedor'>
+      <div class='col-xs-12'>
+          <div class="mod_prodaction text-right">
+              <form id="socioTorcedorForm">
+              <h4>
+                Você é sócio torcedor?<br>
+                Informe seu CPF e ganhe <strong>5% de desconto</strong> na compra!
+              </h4>
+              <div class="input-group">
+                <input type="text" name="cpf" class="form-control" style="width: 50%;" placeholder="CPF" required>
+                <input type="submit" class="btn btn-default" value="Validar">
+              </div>
+              <div class="error">
+              </div>
+            </form>
+          </div>
+      </div>
+  </div>
+    
+    
+    
+    <script>
+        (function($) {
+            $('#socioTorcedorForm input[name="cpf"]').mask('999.999.999-99', {reverse: true});
+            
+            $('#socioTorcedorForm').submit(function(e) {
+                e.preventDefault();
+                    var form = $(this);
+                    var button = form.find('[type="submit"]');
+                    var cpf = form.find('input[name="cpf"]').val();
+                cpf = cpf && cpf.replace(/\D+/g, '');
+                
+                console.log(cpf);
+                
+                if(!cpf) return false;
+                
+                button.attr('disabled', 'disabled');
+                
+                $.get('https://gosoccerapi.azurewebsites.net/bfr/lojabotafogo/cpfativoadimplente/' + cpf + '?apikey=WWFnZFdxZzdUdjAxU0ZBcW11SWlYOHVFVmQrbFJPRkpLQlRxS25zdVVyR094VHErclk0MERhSDExaVQrVzF3WmdpUUl6R1NzbEhtUG5JWUJablpJVUE9PTpiRzlxWVdKdmRHRm1iMmR2TFdGa2JXbHVhWE4wY21Ga2IzSTZaVE0wWVRoak9ESXRabVU1TlMwMFltVTFMV0l4T0RndFpEUTBOelZqTnpNeE1EUTE=')
+                .then(function(response) {
+                    button.removeAttr('disabled');
+                    
+                    
+                    console.log(response);
+                    
+                    var error = false;
+                    if(response.error || (response.status && response.status === 'disabled')) {
+                        form.find('.error').html('<p>Você não é um sócio-torcedor ativo.</p>')
+                        return;
+                    } 
+                    
+                    $.post('/cart/update_cart', { coupon_code: 'cupomteste' })
+                    .then(function(response) {
+                        form.html(response.message);
+                    })
+                });
+                
+                return false;
+            });
+        })(jQuery);
+    </script>
